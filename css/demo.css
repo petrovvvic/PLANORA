@@ -1,0 +1,473 @@
+/* Premium Interactive Workspace & Device Simulation Layout */
+:root {
+    --bg-workspace: #0f111a;
+    --bg-app-dark: #1a1d29;
+    --bg-chat-area: #11131c;
+    --primary: #6d28d9;
+    --primary-light: #a78bfa;
+    --accent: #06b6d4;
+    --text-white: #ffffff;
+    --text-gray: #a0a5b5;
+    --border-soft: rgba(255, 255, 255, 0.08);
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Inter', system-ui, sans-serif;
+}
+
+body {
+    background-color: var(--bg-workspace);
+    color: var(--text-white);
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* Control Top Bar */
+.demo-top-bar {
+    height: 70px;
+    background: #090a10;
+    border-bottom: 1px solid var(--border-soft);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 24px;
+    z-index: 10;
+}
+
+.demo-logo {
+    font-weight: 800;
+    font-size: 1.2rem;
+    letter-spacing: 0.5px;
+}
+
+.badge-demo {
+    background: var(--accent);
+    color: #000;
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 4px;
+    margin-left: 6px;
+    vertical-align: middle;
+}
+
+.view-switcher {
+    display: flex;
+    background: rgba(255,255,255,0.05);
+    padding: 4px;
+    border-radius: 30px;
+    border: 1px solid var(--border-soft);
+}
+
+.view-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-gray);
+    padding: 8px 18px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.view-btn.active {
+    background: var(--primary);
+    color: #fff;
+}
+
+.back-link {
+    color: var(--text-gray);
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: color 0.2s;
+}
+.back-link:hover { color: #fff; }
+
+/* Workspace Setup */
+.workspace-wrapper {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: radial-gradient(circle at center, #161925 0%, #090a10 100%);
+    overflow: hidden;
+}
+
+/* SIMULATION LAYOUT CONTEXT CONTROLLER */
+#appContainer {
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    background: var(--bg-app-dark);
+    overflow: hidden;
+}
+
+/* MODE 1: DESKTOP WORKSPACE VIEW */
+#appContainer.view-mode-desktop {
+    width: 100%;
+    max-width: 1280px;
+    height: 100%;
+    border-radius: 12px;
+    border: 1px solid var(--border-soft);
+    display: grid;
+    grid-template-columns: 260px 1fr 340px;
+    box-shadow: 0 40px 80px rgba(0,0,0,0.5);
+}
+
+/* MODE 2: MOBILE VIEW PREVIEW MOCKUP */
+#appContainer.view-mode-mobile {
+    width: 380px;
+    height: 760px;
+    border: 12px solid #2d3142;
+    border-radius: 40px;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 30px 60px rgba(0,0,0,0.6);
+}
+
+#appContainer.view-mode-mobile .app-sidebar,
+#appContainer.view-mode-mobile .app-itinerary-panel {
+    display: none !important; /* Hide secondary panels in smartphone mockup */
+}
+
+/* Sidebar Module */
+.app-sidebar {
+    background: #141620;
+    border-right: 1px solid var(--border-soft);
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+}
+
+.sidebar-user {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border-soft);
+    margin-bottom: 20px;
+}
+
+.avatar {
+    width: 40px;
+    height: 40px;
+    background: var(--primary);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+}
+
+.sidebar-user h4 { font-size: 0.95rem; }
+.sidebar-user p { font-size: 0.75rem; color: var(--text-gray); }
+
+.sidebar-section h5 {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    color: var(--text-gray);
+    letter-spacing: 1px;
+    margin-bottom: 12px;
+}
+
+.trip-history-list {
+    list-style: none;
+}
+
+.trip-history-list li {
+    padding: 10px 12px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    margin-bottom: 6px;
+    transition: background 0.2s;
+}
+
+.trip-history-list li.active {
+    background: rgba(109,40,217,0.15);
+    color: var(--primary-light);
+    font-weight: 600;
+}
+
+.trip-history-list li.past-trip {
+    color: var(--text-gray);
+}
+.trip-history-list li.past-trip:hover {
+    background: rgba(255,255,255,0.04);
+    color: #fff;
+}
+
+.sidebar-footer {
+    margin-top: auto;
+    font-size: 0.75rem;
+    color: rgba(255,255,255,0.2);
+}
+
+/* Chat Module Engine */
+.app-chat-workspace {
+    display: flex;
+    flex-direction: column;
+    background: var(--bg-chat-area);
+    height: 100%;
+    overflow: hidden;
+}
+
+.chat-header {
+    background: var(--bg-app-dark);
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border-soft);
+}
+
+.chat-title-info h3 { font-size: 1.05rem; font-weight: 700; }
+.status-indicator {
+    font-size: 0.75rem;
+    color: #10b981;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 2px;
+}
+
+.pulse-dot {
+    width: 60px; height: 6px; width: 6px;
+    background-color: #10b981;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.quick-presets {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.preset-pill {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--border-soft);
+    color: var(--text-white);
+    padding: 5px 12px;
+    font-size: 0.75rem;
+    border-radius: 14px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.preset-pill:hover { background: rgba(255,255,255,0.1); }
+
+/* Message flow layout */
+.chat-history {
+    flex: 1;
+    padding: 24px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.msg {
+    max-width: 80%;
+    display: flex;
+    flex-direction: column;
+}
+
+.msg-text {
+    padding: 12px 16px;
+    border-radius: 16px;
+    font-size: 0.92rem;
+    line-height: 1.5;
+}
+
+.msg-bot {
+    align-self: flex-start;
+}
+.msg-bot .msg-text {
+    background: var(--bg-app-dark);
+    border: 1px solid var(--border-soft);
+    color: var(--text-white);
+    border-top-left-radius: 4px;
+}
+
+.msg-user {
+    align-self: flex-end;
+}
+.msg-user .msg-text {
+    background: var(--primary);
+    color: #fff;
+    border-top-right-radius: 4px;
+}
+
+/* Typing Indicator Animation */
+.typing-indicator {
+    align-self: flex-start;
+    font-size: 0.8rem;
+    color: var(--text-gray);
+    background: var(--bg-app-dark);
+    padding: 8px 14px;
+    border-radius: 12px;
+    border: 1px solid var(--border-soft);
+    display: none;
+}
+.typing-indicator .dot {
+    display: inline-block;
+    width: 6px; height: 6px;
+    background: var(--text-gray);
+    border-radius: 50%;
+    margin-right: 3px;
+    animation: wave 1.3s infinite;
+}
+.typing-indicator .dot:nth-child(2) { animation-delay: 0.15s; }
+.typing-indicator .dot:nth-child(3) { animation-delay: 0.3s; }
+
+@keyframes wave {
+    0%, 60%, 100% { transform: translateY(0); }
+    30% { transform: translateY(-4px); }
+}
+
+/* Input form bar footer */
+.chat-input-container {
+    padding: 16px 20px;
+    background: var(--bg-app-dark);
+    border-top: 1px solid var(--border-soft);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.chat-input-container textarea {
+    flex: 1;
+    background: rgba(0,0,0,0.2);
+    border: 1px solid var(--border-soft);
+    color: #fff;
+    border-radius: 20px;
+    padding: 10px 18px;
+    font-size: 0.9rem;
+    resize: none;
+    outline: none;
+    max-height: 100px;
+}
+
+.btn-send {
+    background: var(--primary);
+    color: white;
+    border: none;
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+}
+.btn-send:hover { background: var(--primary-light); }
+
+/* Right Itinerary Panel Content */
+.app-itinerary-panel {
+    background: #141620;
+    border-left: 1px solid var(--border-soft);
+    display: flex;
+    flex-direction: column;
+}
+
+.panel-header {
+    padding: 20px;
+    border-bottom: 1px solid var(--border-soft);
+}
+.panel-header h3 { font-size: 1rem; }
+.panel-header p { font-size: 0.75rem; color: var(--text-gray); }
+
+.panel-body {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+}
+
+.empty-state {
+    text-align: center;
+    color: var(--text-gray);
+    margin-top: 60px;
+}
+.empty-icon { font-size: 2.5rem; margin-bottom: 12px; }
+.empty-state p { font-size: 0.85rem; line-height: 1.5; }
+
+/* Dynamic simulated itinerary component blocks */
+.itin-card {
+    background: var(--bg-app-dark);
+    border: 1px solid var(--border-soft);
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 16px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.itin-banner {
+    height: 100px;
+    background-size: cover;
+    background-position: center;
+    padding: 12px;
+    display: flex;
+    align-items: flex-end;
+    background-color: #333;
+}
+
+.itin-banner h4 {
+    color: #fff;
+    text-shadow: 0 2px 6px rgba(0,0,0,0.8);
+    font-size: 1.2rem;
+}
+
+.itin-details {
+    padding: 14px;
+}
+
+.itin-price {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--accent);
+    margin-bottom: 8px;
+}
+
+.itin-tags {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+}
+
+.itin-tag {
+    font-size: 0.7rem;
+    background: rgba(6, 182, 212, 0.1);
+    color: var(--accent);
+    padding: 2px 8px;
+    border-radius: 4px;
+    border: 1px solid rgba(6, 182, 212, 0.2);
+}
+
+.itin-route-step {
+    border-left: 2px dashed rgba(255,255,255,0.15);
+    padding-left: 14px;
+    margin-left: 6px;
+    position: relative;
+    padding-bottom: 12px;
+    font-size: 0.82rem;
+}
+.itin-route-step::before {
+    content: '';
+    position: absolute;
+    left: -5px; top: 4px;
+    width: 8px; height: 8px;
+    background: var(--primary-light);
+    border-radius: 50%;
+}
+
+.itin-route-step:last-child {
+    padding-bottom: 0;
+    border-left: none;
+}
+.itin-route-step:last-child::before {
+    left: -3px;
+}
