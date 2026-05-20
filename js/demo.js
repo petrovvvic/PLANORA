@@ -26,7 +26,7 @@ const presets = {
     vietnam: {
         title: "Vietnam",
         price: "7 Tage ab 690 €",
-        tags: ["🌳 Natur", "🍜 Essen", "🏛️ Kultur"],
+        tags: ["Natur", "Essen", "Kultur"],
         banner: "https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=400&q=80",
         steps: [
             "Tag 1-2: Altstadt von Hanoi & Streetfood-Tour",
@@ -38,7 +38,7 @@ const presets = {
     portugal: {
         title: "Portugal",
         price: "7 Tage ab 750 €",
-        tags: ["🏖️ Strand", "🏙️ Städte", "🍷 Genuss"],
+        tags: ["Strand", "Städte", "Genuss"],
         banner: "https://images.unsplash.com/photo-1555881400-74d7acaacd8b?auto=format&fit=crop&w=400&q=80",
         steps: [
             "Tag 1-2: Kultur & Kulinarik in den Seitengassen von Porto",
@@ -50,7 +50,7 @@ const presets = {
     georgien: {
         title: "Georgien",
         price: "7 Tage ab 620 €",
-        tags: ["⛰️ Natur", "🏛️ Kultur", "🎒 Abenteuer"],
+        tags: ["Natur", "Kultur", "Abenteuer"],
         banner: "https://images.unsplash.com/photo-1565018985116-46b5a34f41b2?auto=format&fit=crop&w=400&q=80",
         steps: [
             "Tag 1-2: Erkundung von Tiflis (Tradition trifft Moderne) & Weinverkostung",
@@ -119,7 +119,7 @@ function renderItinerary(data) {
                 ${stepsHtml}
             </div>
         </div>
-        <button class="preset-pill" style="width:100%; padding:12px; background:var(--primary); font-weight:700; margin-top:10px; border-radius:8px;" onclick="alert('Buchungsprozess via Partnerschnittstelle simuliert!')">✈️ Komplettbuchung mit 1 Klick</button>
+        <button class="preset-pill" style="width:100%; padding:12px; background:var(--primary); font-weight:700; margin-top:10px; border-radius:8px;" onclick="alert('Buchungsprozess via Partnerschnittstelle simuliert!')">Komplettbuchung mit 1 Klick</button>
     `;
 }
 

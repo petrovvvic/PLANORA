@@ -11,14 +11,14 @@
     <!-- Demo Control Bar -->
     <div class="demo-top-bar">
         <div class="demo-logo">
-            <span>✈️ PLANORA <small class="badge-demo">DEMO-MODE</small></span>
+            <span>PLANORA <small class="badge-demo">Demo-Modus</small></span>
         </div>
         <div class="view-switcher">
-            <button id="btnDesktopView" class="view-btn active" onclick="switchView('desktop')">🖥️ Desktop-Webversion</button>
-            <button id="btnMobileView" class="view-btn" onclick="switchView('mobile')">📱 Handy-Appversion</button>
+            <button id="btnDesktopView" class="view-btn active" onclick="switchView('desktop')">Desktop-Ansicht</button>
+            <button id="btnMobileView" class="view-btn" onclick="switchView('mobile')">Mobil-Ansicht</button>
         </div>
         <div>
-            <a href="index.html" class="back-link">&larr; Zurück zur Landingpage</a>
+            <a href="index.html" class="back-link">Zurück zur Landingpage</a>
         </div>
     </div>
 
@@ -40,10 +40,10 @@
                 <div class="sidebar-section">
                     <h5>Deine geplanten Trips</h5>
                     <ul class="trip-history-list">
-                        <li class="active">✨ Neuer Live-Trip (Planung...)</li>
-                        <li class="past-trip" onclick="loadPreset('vietnam')">🍜 Vietnam Kulinarik (Archiv)</li>
-                        <li class="past-trip" onclick="loadPreset('portugal')">🏖️ Portugal Strand (Archiv)</li>
-                        <li class="past-trip" onclick="loadPreset('georgien')">⛰️ Georgien Abenteuer (Archiv)</li>
+                        <li class="active">Neuer Live-Trip (Planung...)</li>
+                        <li class="past-trip" onclick="loadPreset('vietnam')">Vietnam Kulinarik (Archiv)</li>
+                        <li class="past-trip" onclick="loadPreset('portugal')">Portugal Strand (Archiv)</li>
+                        <li class="past-trip" onclick="loadPreset('georgien')">Georgien Abenteuer (Archiv)</li>
                     </ul>
                 </div>
                 <div class="sidebar-footer">
@@ -55,13 +55,13 @@
             <main class="app-chat-workspace">
                 <header class="chat-header">
                     <div class="chat-title-info">
-                        <h3>🤖 Planora AI Reise-Assistent</h3>
+                        <h3>Planora AI Reise-Assistent</h3>
                         <p class="status-indicator"><span class="pulse-dot"></span> Bereit für deine Wünsche</p>
                     </div>
                     <div class="quick-presets">
-                        <button class="preset-pill" onclick="loadPreset('vietnam')">🍜 Vietnam</button>
-                        <button class="preset-pill" onclick="loadPreset('portugal')">🏖️ Portugal</button>
-                        <button class="preset-pill" onclick="loadPreset('georgien')">⛰️ Georgien</button>
+                        <button class="preset-pill" onclick="loadPreset('vietnam')">Vietnam</button>
+                        <button class="preset-pill" onclick="loadPreset('portugal')">Portugal</button>
+                        <button class="preset-pill" onclick="loadPreset('georgien')">Georgien</button>
                     </div>
                 </header>
 
@@ -69,7 +69,7 @@
                 <div class="chat-history" id="chatHistory">
                     <div class="msg msg-bot">
                         <div class="msg-text">
-                            Hallo! Ich bin dein persönlicher PLANORA KI-Reiseassistent. 🌍<br><br>
+                            Hallo! Ich bin dein persönlicher PLANORA KI-Reiseassistent.<br><br>
                             Egal ob du schon ein festes Ziel hast oder völlig flexibel bist: Beschreibe mir einfach deine Wünsche, deine ungefähre Reisedauer und dein Maximalbudget. Ich plane deinen Traumurlaub in Echtzeit!
                         </div>
                     </div>
@@ -88,12 +88,12 @@
             <!-- SPLIT SCREEN SIDE PANEL: Live Itinerary details (Desktop exclusive for extra polish) -->
             <section class="app-itinerary-panel">
                 <div class="panel-header">
-                    <h3>🗺️ Live-Reiseübersicht</h3>
+                    <h3>Live-Reiseübersicht</h3>
                     <p>Aktualisiert sich dynamisch per KI</p>
                 </div>
                 <div class="panel-body" id="itineraryDetailView">
                     <div class="empty-state">
-                        <div class="empty-icon">📍</div>
+                        <div class="empty-icon">i</div>
                         <p>Noch kein Reiseziel finalisiert. Tippe deine Wünsche ein oder nutze einen Quick-Preset oben, um die interaktive Reiseroute anzuzeigen!</p>
                     </div>
                 </div>

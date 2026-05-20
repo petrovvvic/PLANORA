@@ -6,6 +6,7 @@
     <title>PLANORA - Dein KI-Reiseassistent | Jede Reise. Perfekt geplant.</title>
     <link rel="stylesheet" href="css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script src="js/home.js" defer></script>
 </head>
 <body>
 
@@ -41,19 +42,26 @@
                 </div>
             </div>
             <div class="hero-visual">
-                <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80" alt="Strand" class="hero-image">
-                <div class="mockup-container">
-                    <div class="mockup-header">
-                        <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+                <div class="hero-slider" aria-label="Beispielhafte Strand-Inspirationen">
+                    <div class="hero-slide is-active" data-title="Tropische Ruhe" data-copy="Weite Strände, warmes Licht und der perfekte Einstieg in die Reiseplanung." style="background-image: linear-gradient(180deg, rgba(9,5,20,0.08), rgba(9,5,20,0.72)), url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1600&q=80');">
                     </div>
-                    <div class="mockup-body">
-                        <div class="chat-bubble user">7 Tage Urlaub, max 800€, gutes Essen, Natur, wenig Touristen. Empfehlungen?</div>
-                        <div class="chat-bubble bot">
-                            <strong>PLANORA AI:</strong> Perfekt! Hier sind passende Geheimtipps für dich:
-                            <div class="mini-card">Georgien (Natur & Kultur) - ab 620€</div>
-                            <div class="mini-card">Vietnam (Essen & Natur) - ab 690€</div>
-                        </div>
+                    <div class="hero-slide" data-title="Klares Wasser" data-copy="Ein ruhiger Küstenmoment mit heller Brandung und entspannter Resort-Atmosphäre." style="background-image: linear-gradient(180deg, rgba(9,5,20,0.08), rgba(9,5,20,0.72)), url('https://images.unsplash.com/photo-1519046904884-53103b34b206?auto=format&fit=crop&w=1600&q=80');">
                     </div>
+                    <div class="hero-slide" data-title="Goldene Abendküste" data-copy="Noch mehr Tiefe, mehr Licht und eine Bildwelt, die sich wie ein Reiseziel anfühlt." style="background-image: linear-gradient(180deg, rgba(9,5,20,0.08), rgba(9,5,20,0.72)), url('https://images.unsplash.com/photo-1500375592092-40eb2168fd21?auto=format&fit=crop&w=1600&q=80');">
+                    </div>
+                    <div class="hero-slide-content">
+                        <span class="slider-kicker">Beach Slider</span>
+                        <h3 id="heroSlideTitle">Tropische Ruhe</h3>
+                        <p id="heroSlideCopy">Weite Strände, warmes Licht und der perfekte Einstieg in die Reiseplanung.</p>
+                    </div>
+                    <button class="slider-control slider-prev" type="button" data-slider-prev aria-label="Vorheriges Bild">‹</button>
+                    <button class="slider-control slider-next" type="button" data-slider-next aria-label="Nächstes Bild">›</button>
+                    <div class="slider-dots" aria-label="Slider Navigation"></div>
+                </div>
+                <div class="hero-summary">
+                    <span>KI-Planung live</span>
+                    <strong>Strand, Budget und Ruhe in einem Blick.</strong>
+                    <p>Der Slider zeigt die Reiseatmosphäre, während PLANORA im Hintergrund passende Routen und Optionen kombiniert.</p>
                 </div>
             </div>
         </div>
@@ -168,23 +176,23 @@
             </div>
             <div class="grid grid-3">
                 <div class="card feature-box">
-                    <div class="feature-title">🌍 Zieloffen planen</div>
+                    <div class="feature-title">Zieloffen planen</div>
                     <p>Du musst vorher nicht wissen, wohin die Reise gehen soll – wir finden das perfekte Ziel für dich.</p>
                 </div>
                 <div class="card feature-box">
-                    <div class="feature-title">💶 Budget-Intelligenz</div>
+                    <div class="feature-title">Budget-Intelligenz</div>
                     <p>Unrealistische Erwartungen? Kein Problem. PLANORA berechnet in Echtzeit clevere, bezahlbare Alternativen.</p>
                 </div>
                 <div class="card feature-box">
-                    <div class="feature-title">⚖️ Reisen vergleichen</div>
+                    <div class="feature-title">Reisen vergleichen</div>
                     <p>Vergleiche mehrere Destinationen, Preisstrukturen und Aktivitäten direkt nebeneinander in einer Übersicht.</p>
                 </div>
                 <div class="card feature-box">
-                    <div class="feature-title">🔄 Dynamisch & Flexibel</div>
+                    <div class="feature-title">Dynamisch & Flexibel</div>
                     <p>Pläne ändern sich? PLANORA passt deine gesamte Reiseroute und Buchungen dynamisch und in Echtzeit an.</p>
                 </div>
                 <div class="card feature-box">
-                    <div class="feature-title">👤 Persönlich & Lernend</div>
+                    <div class="feature-title">Persönlich & Lernend</div>
                     <p>Je öfter du mit PLANORA planst, desto besser versteht die KI deinen Geschmack und optimiert künftige Trips.</p>
                 </div>
             </div>
@@ -213,45 +221,45 @@
                     <tbody>
                         <tr>
                             <td class="feature-name">Versteht deine Wünsche</td>
-                            <td class="check-yes">✓</td>
-                            <td class="check-partial">teilweise</td>
-                            <td class="check-no">✕</td>
-                            <td class="check-partial">teilweise</td>
+                            <td class="check-yes">Ja</td>
+                            <td class="check-partial">Teilweise</td>
+                            <td class="check-no">Nein</td>
+                            <td class="check-partial">Teilweise</td>
                         </tr>
                         <tr>
                             <td class="feature-name">Zieloffene Suche</td>
-                            <td class="check-yes">✓</td>
-                            <td class="check-no">✕</td>
-                            <td class="check-no">✕</td>
-                            <td class="check-partial">teilweise</td>
+                            <td class="check-yes">Ja</td>
+                            <td class="check-no">Nein</td>
+                            <td class="check-no">Nein</td>
+                            <td class="check-partial">Teilweise</td>
                         </tr>
                         <tr>
                             <td class="feature-name">Budget-Optimierung & Alternativen</td>
-                            <td class="check-yes">✓</td>
-                            <td class="check-no">✕</td>
-                            <td class="check-no">✕</td>
-                            <td class="check-partial">teilweise</td>
+                            <td class="check-yes">Ja</td>
+                            <td class="check-no">Nein</td>
+                            <td class="check-no">Nein</td>
+                            <td class="check-partial">Teilweise</td>
                         </tr>
                         <tr>
                             <td class="feature-name">Reise vergleichen</td>
-                            <td class="check-yes">✓</td>
-                            <td class="check-partial">teilweise</td>
-                            <td class="check-partial">teilweise</td>
-                            <td class="check-no">✕</td>
+                            <td class="check-yes">Ja</td>
+                            <td class="check-partial">Teilweise</td>
+                            <td class="check-partial">Teilweise</td>
+                            <td class="check-no">Nein</td>
                         </tr>
                         <tr>
                             <td class="feature-name">Komplette Reiseplanung</td>
-                            <td class="check-yes">✓</td>
-                            <td class="check-partial">teilweise</td>
-                            <td class="check-no">✕</td>
-                            <td class="check-no">✕</td>
+                            <td class="check-yes">Ja</td>
+                            <td class="check-partial">Teilweise</td>
+                            <td class="check-no">Nein</td>
+                            <td class="check-no">Nein</td>
                         </tr>
                         <tr>
                             <td class="feature-name">Dynamische Anpassung</td>
-                            <td class="check-yes">✓</td>
-                            <td class="check-no">✕</td>
-                            <td class="check-no">✕</td>
-                            <td class="check-no">✕</td>
+                            <td class="check-yes">Ja</td>
+                            <td class="check-no">Nein</td>
+                            <td class="check-no">Nein</td>
+                            <td class="check-no">Nein</td>
                         </tr>
                     </tbody>
                 </table>
@@ -265,7 +273,7 @@
             <div class="grid grid-3">
                 <!-- Marktpotenzial -->
                 <div class="business-column">
-                    <div class="column-header">📊 Marktpotenzial</div>
+                    <div class="column-header">Marktpotenzial</div>
                     <div class="stat-block">
                         <div class="stat-number">1,4 Bio. $</div>
                         <div class="stat-label">Globaler Reisemarkt bis 2027</div>
@@ -279,7 +287,7 @@
 
                 <!-- Geschäftsmodell -->
                 <div class="business-column">
-                    <div class="column-header">💰 Geschäftsmodell</div>
+                    <div class="column-header">Geschäftsmodell</div>
                     <ul class="business-list">
                         <li><strong>Provisionen:</strong> Vermittlungsgebühren auf Flüge, Hotels & gebuchte Aktivitäten.</li>
                         <li><strong>Premium-Abo:</strong> Monatliche Gebühr für erweiterte personalisierte Planung & 24/7 Concierge-KI.</li>
@@ -290,13 +298,13 @@
 
                 <!-- Zielgruppe -->
                 <div class="business-column">
-                    <div class="column-header">🎯 Zielgruppe</div>
+                    <div class="column-header">Zielgruppe</div>
                     <div class="tag-container">
-                        <span class="target-tag">🎒 Junge Reisende & Backpacker</span>
-                        <span class="target-tag">💼 Berufstätige mit wenig Zeit</span>
-                        <span class="target-tag">💻 Digital Nomads</span>
-                        <span class="target-tag">👨‍👩‍👧‍👦 Gruppen & Familien</span>
-                        <span class="target-tag">🗺️ Individualreisende</span>
+                        <span class="target-tag">Junge Reisende & Backpacker</span>
+                        <span class="target-tag">Berufstätige mit wenig Zeit</span>
+                        <span class="target-tag">Digital Nomads</span>
+                        <span class="target-tag">Gruppen & Familien</span>
+                        <span class="target-tag">Individualreisende</span>
                     </div>
                 </div>
             </div>
@@ -312,19 +320,19 @@
             </blockquote>
             <div class="grid grid-4 vision-pillars">
                 <div>
-                    <h4>🧠 Intelligent</h4>
+                    <h4>Intelligent</h4>
                     <p>Verstehen. Analysieren. Optimieren.</p>
                 </div>
                 <div>
-                    <h4>👤 Persönlich</h4>
+                    <h4>Persönlich</h4>
                     <p>Maßgeschneiderte Reisen, die wirklich zu dir passen.</p>
                 </div>
                 <div>
-                    <h4>🛡️ Zuverlässig</h4>
+                    <h4>Zuverlässig</h4>
                     <p>Aktuelle Daten, ehrliche Empfehlungen.</p>
                 </div>
                 <div>
-                    <h4>✨ Einfach</h4>
+                    <h4>Einfach</h4>
                     <p>Eine Anfrage. Eine perfekte Reise.</p>
                 </div>
             </div>
