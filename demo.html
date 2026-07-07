@@ -1,107 +1,790 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PLANORA - Interaktive Demo App</title>
-    <link rel="stylesheet" href="css/demo.css">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>PLANORA – Dein KI-Reiseassistent</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --purple:#7C3AED; --purple-d:#6D28D9; --purple-l:#A78BFA;
+    --lav:#F5F3FF; --lav-2:#EDE9FE; --ink:#1E1B2E; --muted:#6B7280;
+    --line:#E7E4F0; --white:#fff; --green:#16a34a; --amber:#d97706;
+    --shadow:0 10px 30px rgba(109,40,217,.12); --shadow-sm:0 4px 14px rgba(109,40,217,.10);
+    --radius:20px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    font-family:'Montserrat',-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    color:var(--ink); background:linear-gradient(160deg,#faf9ff 0%,#f1ecff 100%);
+    -webkit-font-smoothing:antialiased;
+  }
+  #root{min-height:100%;display:flex;flex-direction:column}
+  .app{width:100%;max-width:820px;margin:0 auto;flex:1;display:flex;flex-direction:column;height:100vh;overflow:hidden;background:var(--white);box-shadow:0 0 60px rgba(109,40,217,.08)}
+  /* Header */
+  .hd{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1px solid var(--line);position:sticky;top:0;background:rgba(255,255,255,.92);backdrop-filter:blur(10px);z-index:20}
+  .logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:22px;letter-spacing:.5px;color:var(--ink)}
+  .logo .mark{width:34px;height:34px;display:grid;place-items:center;background:linear-gradient(135deg,var(--purple),var(--purple-l));border-radius:11px;color:#fff}
+  .hd a.back{font-size:13px;color:var(--purple-d);text-decoration:none;font-weight:600;display:flex;align-items:center;gap:6px}
+  .hd a.back:hover{text-decoration:underline}
+  /* Chat area */
+  .chat{flex:1;overflow-y:auto;padding:22px 20px 8px}
+  .intro{text-align:center;padding:26px 10px 10px}
+  .intro h1{font-size:24px;font-weight:800;margin-bottom:8px}
+  .intro p{color:var(--muted);font-size:15px;max-width:460px;margin:0 auto}
+  .msg{display:flex;margin:14px 0;gap:10px;animation:rise .35s ease}
+  .msg.user{justify-content:flex-end}
+  .bubble{max-width:78%;padding:13px 16px;border-radius:18px;font-size:15px;line-height:1.5}
+  .msg.bot .bubble{background:var(--lav);border-bottom-left-radius:6px}
+  .msg.user .bubble{background:linear-gradient(135deg,var(--purple),var(--purple-d));color:#fff;border-bottom-right-radius:6px}
+  .avatar{width:34px;height:34px;border-radius:10px;flex-shrink:0;display:grid;place-items:center;background:linear-gradient(135deg,var(--purple),var(--purple-l));color:#fff}
+  /* Analyzing */
+  .analyze{background:var(--lav);border-radius:18px;border-bottom-left-radius:6px;padding:14px 16px;max-width:78%}
+  .astep{display:flex;align-items:center;gap:9px;font-size:14px;color:var(--muted);padding:4px 0;opacity:.4;transition:.3s}
+  .astep.on{opacity:1;color:var(--ink)}
+  .astep .dot{width:16px;height:16px;border-radius:50%;border:2px solid var(--purple-l);flex-shrink:0}
+  .astep.done .dot{background:var(--green);border-color:var(--green)}
+  .astep.done .dot::after{content:"✓";color:#fff;font-size:10px;display:grid;place-items:center;height:100%}
+  .typing{display:flex;gap:4px;padding:4px 2px}
+  .typing span{width:8px;height:8px;background:var(--purple-l);border-radius:50%;animation:blink 1.2s infinite}
+  .typing span:nth-child(2){animation-delay:.2s}.typing span:nth-child(3){animation-delay:.4s}
+  /* Cards */
+  .cards{display:flex;flex-direction:column;gap:14px;margin:6px 0 8px 44px}
+  .rec-head{margin:4px 0 2px 44px;font-size:13px;font-weight:700;color:var(--purple-d);text-transform:uppercase;letter-spacing:.6px}
+  .card{border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;cursor:pointer;transition:.2s;background:#fff;box-shadow:var(--shadow-sm)}
+  .card:hover{transform:translateY(-3px);box-shadow:var(--shadow);border-color:var(--purple-l)}
+  .card .scene{height:120px;position:relative}
+  .card .match{position:absolute;top:10px;right:10px;background:rgba(255,255,255,.95);color:var(--purple-d);font-weight:800;font-size:12px;padding:5px 10px;border-radius:20px;box-shadow:var(--shadow-sm)}
+  .card .body{padding:14px 16px}
+  .card .body .top{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+  .card .body h3{font-size:18px;font-weight:800}
+  .card .body .price{font-weight:800;color:var(--purple-d);font-size:16px;white-space:nowrap}
+  .card .body .price small{display:block;font-weight:500;color:var(--muted);font-size:11px;text-align:right}
+  .card .sub{color:var(--muted);font-size:13px;margin-top:2px}
+  .tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+  .tag{font-size:12px;background:var(--lav-2);color:var(--purple-d);padding:4px 10px;border-radius:20px;font-weight:600}
+  .compare-btn{margin:8px 0 4px 44px;align-self:flex-start;background:#fff;border:1.5px solid var(--purple-l);color:var(--purple-d);font-weight:700;font-size:13px;padding:9px 16px;border-radius:12px;cursor:pointer;display:inline-flex;gap:7px;align-items:center}
+  .compare-btn:hover{background:var(--lav)}
+  /* Input bar */
+  .inputbar{position:sticky;bottom:0;background:rgba(255,255,255,.96);backdrop-filter:blur(10px);border-top:1px solid var(--line);padding:14px 16px}
+  .chips{display:flex;gap:8px;overflow-x:auto;padding-bottom:10px;-webkit-overflow-scrolling:touch}
+  .chip{white-space:nowrap;background:var(--lav);border:1px solid var(--line);color:var(--purple-d);font-size:13px;padding:8px 13px;border-radius:20px;cursor:pointer;font-weight:600;flex-shrink:0}
+  .chip:hover{background:var(--lav-2)}
+  .ib-row{display:flex;gap:10px;align-items:flex-end}
+  .ib-row textarea{flex:1;border:1.5px solid var(--line);border-radius:16px;padding:13px 16px;font-size:15px;font-family:inherit;resize:none;max-height:120px;outline:none;line-height:1.4}
+  .ib-row textarea:focus{border-color:var(--purple-l)}
+  .send{width:48px;height:48px;border:none;border-radius:14px;background:linear-gradient(135deg,var(--purple),var(--purple-d));color:#fff;cursor:pointer;display:grid;place-items:center;flex-shrink:0;transition:.2s}
+  .send:hover{transform:scale(1.05)}
+  .send:disabled{opacity:.4;cursor:not-allowed;transform:none}
+  /* Detail */
+  .detail{flex:1;overflow-y:auto}
+  .d-hero{height:200px;position:relative;display:flex;align-items:flex-end}
+  .d-hero .d-title{position:relative;padding:20px;color:#fff}
+  .d-hero .d-title h2{font-size:28px;font-weight:800;text-shadow:0 2px 12px rgba(0,0,0,.3)}
+  .d-hero .d-title p{font-size:14px;opacity:.95;text-shadow:0 1px 8px rgba(0,0,0,.3)}
+  .d-hero .scrim{position:absolute;inset:0;background:linear-gradient(to top,rgba(30,27,46,.55),rgba(30,27,46,0) 60%)}
+  .d-body{padding:20px}
+  .stat-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px}
+  .stat{flex:1;min-width:120px;background:var(--lav);border-radius:14px;padding:12px 14px}
+  .stat .k{font-size:12px;color:var(--muted);font-weight:600}
+  .stat .v{font-size:16px;font-weight:800;margin-top:2px}
+  .sec-title{font-size:16px;font-weight:800;margin:20px 0 10px;display:flex;align-items:center;gap:8px}
+  .itin{position:relative;padding-left:22px}
+  .itin::before{content:"";position:absolute;left:6px;top:6px;bottom:6px;width:2px;background:var(--lav-2)}
+  .day{position:relative;padding:0 0 16px 6px}
+  .day::before{content:"";position:absolute;left:-19px;top:4px;width:12px;height:12px;border-radius:50%;background:var(--purple);border:3px solid #fff;box-shadow:0 0 0 2px var(--lav-2)}
+  .day .dn{font-size:13px;font-weight:800;color:var(--purple-d)}
+  .day .dt{font-size:14px;color:var(--ink);margin-top:1px}
+  .day-badge{display:inline-flex;align-items:center;gap:4px;margin-left:8px;background:linear-gradient(135deg,#f43f5e,#ec4899);color:#fff;font-size:10px;font-weight:800;padding:2px 8px;border-radius:20px;vertical-align:middle;white-space:nowrap}
+  .breakdown{border:1px solid var(--line);border-radius:16px;overflow:hidden}
+  .brow{display:flex;align-items:center;gap:12px;padding:13px 15px;border-bottom:1px solid var(--line)}
+  .brow:last-child{border-bottom:none}
+  .brow .bi{width:36px;height:36px;border-radius:10px;background:var(--lav);display:grid;place-items:center;color:var(--purple-d);flex-shrink:0}
+  .brow .bt{flex:1}
+  .brow .bt .b1{font-weight:700;font-size:14px}
+  .brow .bt .b2{font-size:12px;color:var(--muted)}
+  .brow .bp{font-weight:800}
+  .brow.total{background:var(--lav);font-size:16px}
+  .brow.total .bt .b1{font-weight:800}
+  .partners{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin-top:12px}
+  .plogo{background:#fff;border:1px solid var(--line);border-radius:8px;padding:5px 9px;font-weight:700;font-size:12px;color:var(--ink)}
+  .stickybar{position:sticky;bottom:0;background:rgba(255,255,255,.96);backdrop-filter:blur(10px);border-top:1px solid var(--line);padding:14px 20px;display:flex;align-items:center;justify-content:space-between;gap:14px}
+  .stickybar .pp{font-size:12px;color:var(--muted)}
+  .stickybar .pp b{font-size:20px;color:var(--ink);display:block}
+  .btn{background:linear-gradient(135deg,var(--purple),var(--purple-d));color:#fff;border:none;padding:14px 26px;border-radius:14px;font-size:15px;font-weight:700;cursor:pointer;transition:.2s;flex-shrink:0}
+  .btn:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
+  .btn.ghost{background:#fff;color:var(--purple-d);border:1.5px solid var(--purple-l)}
+  .subbar{padding:14px 20px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:12px}
+  .subbar .lk{color:var(--purple-d);cursor:pointer;font-weight:700;font-size:14px;display:flex;align-items:center;gap:6px}
+  /* Compare */
+  .cmp{padding:20px;overflow-x:auto}
+  table.ct{width:100%;border-collapse:collapse;font-size:14px}
+  table.ct th,table.ct td{padding:12px 10px;text-align:left;border-bottom:1px solid var(--line)}
+  table.ct th{font-size:13px;color:var(--muted);font-weight:700}
+  table.ct td.d{font-weight:800;color:var(--purple-d)}
+  table.ct tr:hover{background:var(--lav)}
+  /* Checkout */
+  .co{padding:20px;flex:1;overflow-y:auto}
+  .co h2{font-size:22px;font-weight:800;margin-bottom:4px}
+  .co .lead{color:var(--muted);font-size:14px;margin-bottom:18px}
+  .field{margin-bottom:14px}
+  .field label{display:block;font-size:13px;font-weight:700;margin-bottom:6px}
+  .field input{width:100%;border:1.5px solid var(--line);border-radius:12px;padding:12px 14px;font-size:15px;font-family:inherit;outline:none}
+  .field input:focus{border-color:var(--purple-l)}
+  .grid2{display:flex;gap:12px}.grid2 .field{flex:1}
+  .summary{background:var(--lav);border-radius:16px;padding:16px;margin-bottom:18px}
+  .summary .sr{display:flex;justify-content:space-between;font-size:14px;padding:5px 0}
+  .summary .sr.tot{font-weight:800;font-size:16px;border-top:1px solid var(--line);margin-top:6px;padding-top:10px}
+  .secure{font-size:12px;color:var(--muted);text-align:center;margin-top:10px;display:flex;align-items:center;justify-content:center;gap:6px}
+  /* Confirmation */
+  .cf{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:40px 24px}
+  .cf .ok{width:88px;height:88px;border-radius:50%;background:linear-gradient(135deg,#22c55e,#16a34a);display:grid;place-items:center;color:#fff;margin-bottom:20px;animation:pop .5s ease}
+  .cf h2{font-size:26px;font-weight:800;margin-bottom:8px}
+  .cf p{color:var(--muted);max-width:420px;margin-bottom:6px}
+  .cf .ref{background:var(--lav);border-radius:14px;padding:14px 22px;margin:18px 0;font-weight:800;letter-spacing:1px;color:var(--purple-d)}
+  .demo-badge{position:fixed;bottom:14px;left:14px;background:var(--ink);color:#fff;font-size:11px;padding:6px 11px;border-radius:20px;opacity:.7;z-index:50;font-weight:600}
+  /* Bottom nav */
+  .nav{display:flex;border-top:1px solid var(--line);background:rgba(255,255,255,.97);backdrop-filter:blur(10px);flex-shrink:0}
+  .nav button{flex:1;border:none;background:none;cursor:pointer;padding:9px 4px 8px;display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--muted);font-size:11px;font-weight:600;transition:.15s}
+  .nav button.on{color:var(--purple-d)}
+  .nav button svg{width:22px;height:22px}
+  .nav button.on svg{transform:translateY(-1px)}
+  /* Generic page */
+  .page{flex:1;overflow-y:auto;padding:20px}
+  .page h2.ph{font-size:22px;font-weight:800;margin-bottom:4px}
+  .page .psub{color:var(--muted);font-size:14px;margin-bottom:16px}
+  .badge{font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px}
+  .badge.up{background:#dcfce7;color:#15803d}.badge.done{background:var(--lav-2);color:var(--purple-d)}
+  /* Trips */
+  .trip{display:flex;gap:14px;align-items:center;border:1px solid var(--line);border-radius:16px;padding:12px;margin-bottom:12px;cursor:pointer;transition:.2s;background:#fff}
+  .trip:hover{border-color:var(--purple-l);box-shadow:var(--shadow-sm)}
+  .trip .thumb{width:74px;height:74px;border-radius:12px;overflow:hidden;position:relative;flex-shrink:0}
+  .trip .ti{flex:1}.trip .ti .tn{font-weight:800;font-size:16px}
+  .trip .ti .td{font-size:13px;color:var(--muted);margin-top:2px}
+  .trip .ti .tl{font-size:12px;color:var(--purple-d);font-weight:700;margin-top:6px;display:inline-flex;align-items:center;gap:4px}
+  /* Recap */
+  .rc-hero{height:150px;position:relative;display:flex;align-items:flex-end;border-radius:16px;overflow:hidden;margin-bottom:14px}
+  .rc-hero .scrim{position:absolute;inset:0;background:linear-gradient(to top,rgba(30,27,46,.6),transparent 70%)}
+  .rc-hero .rt{position:relative;padding:14px;color:#fff}.rc-hero .rt h2{font-size:24px;font-weight:800}
+  .rc-hero .rt p{font-size:13px;opacity:.95}
+  .rc-stats{display:flex;gap:8px;margin-bottom:16px}
+  .rc-stat{flex:1;background:var(--lav);border-radius:12px;padding:10px;text-align:center}
+  .rc-stat .n{font-size:19px;font-weight:800;color:var(--purple-d)}
+  .rc-stat .l{font-size:11px;color:var(--muted);font-weight:600}
+  .photo-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .photo{border-radius:14px;overflow:hidden;position:relative;aspect-ratio:1/1;box-shadow:var(--shadow-sm)}
+  .photo.wide{grid-column:span 2;aspect-ratio:2/1}
+  .photo .cap{position:absolute;left:0;right:0;bottom:0;padding:8px 10px;color:#fff;font-size:12px;font-weight:600;background:linear-gradient(to top,rgba(30,27,46,.75),transparent);text-shadow:0 1px 4px rgba(0,0,0,.4)}
+  .aigen{display:flex;align-items:center;gap:8px;background:var(--lav);border-radius:12px;padding:11px 14px;font-size:13px;color:var(--purple-d);font-weight:600;margin:14px 0}
+  /* Profile */
+  .prof-hero{display:flex;align-items:center;gap:16px;margin-bottom:20px}
+  .prof-hero .pav{width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,var(--purple),var(--purple-l));color:#fff;display:grid;place-items:center;font-size:28px;font-weight:800}
+  .prof-hero .pn{font-size:20px;font-weight:800}.prof-hero .pm{font-size:13px;color:var(--muted)}
+  .prof-stats{display:flex;gap:8px;margin-bottom:20px}
+  .prof-stats .s{flex:1;background:var(--lav);border-radius:14px;padding:12px;text-align:center}
+  .prof-stats .s .n{font-size:18px;font-weight:800}.prof-stats .s .l{font-size:11px;color:var(--muted);font-weight:600;margin-top:2px}
+  .premium{background:linear-gradient(135deg,var(--purple),var(--purple-d));color:#fff;border-radius:18px;padding:18px;margin-bottom:20px}
+  .premium h3{font-size:17px;font-weight:800;margin-bottom:4px}.premium p{font-size:13px;opacity:.9;margin-bottom:12px}
+  .premium button{background:#fff;color:var(--purple-d);border:none;padding:10px 18px;border-radius:12px;font-weight:800;cursor:pointer;font-size:14px}
+  .menu{border:1px solid var(--line);border-radius:16px;overflow:hidden}
+  .menu .row{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--line);font-size:14px;font-weight:600;cursor:pointer}
+  .menu .row:last-child{border-bottom:none}.menu .row:hover{background:var(--lav)}
+  .menu .row .rv{color:var(--muted);font-weight:500;font-size:13px}
+  /* Viral / trending */
+  .viral-badge{position:absolute;top:10px;left:10px;display:inline-flex;align-items:center;gap:5px;background:linear-gradient(135deg,#f43f5e,#ec4899);color:#fff;font-weight:800;font-size:11px;padding:5px 9px;border-radius:20px;box-shadow:var(--shadow-sm)}
+  .pers-banner{margin:2px 0 6px 44px;background:var(--lav);border:1px solid var(--line);border-radius:14px;padding:11px 14px;font-size:13px}
+  .pers-banner .pb-t{font-weight:800;color:var(--purple-d);margin-bottom:7px;display:flex;align-items:center;gap:6px}
+  .pers-banner .tags{margin-top:0}
+  .trend-strip{margin:16px 0 4px}
+  .trend-strip .th{font-size:13px;font-weight:800;color:#e11d48;text-transform:uppercase;letter-spacing:.5px;display:flex;align-items:center;gap:6px;margin-bottom:10px}
+  .trend-row{display:flex;gap:10px;overflow-x:auto;padding-bottom:6px}
+  .trend-card{flex-shrink:0;width:130px;border-radius:14px;overflow:hidden;border:1px solid var(--line);cursor:pointer;background:#fff;transition:.2s}
+  .trend-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-sm);border-color:var(--purple-l)}
+  .trend-card .tc-sc{height:74px;position:relative}
+  .trend-card .tc-b{padding:8px 10px}.trend-card .tc-b .n{font-weight:800;font-size:13px}
+  .trend-card .tc-b .v{font-size:11px;color:#e11d48;font-weight:700;margin-top:1px}
+  .viral-sec{border:1px solid #fbcfe8;background:linear-gradient(135deg,#fff1f2,#fdf2f8);border-radius:16px;padding:14px 16px;margin-top:14px}
+  .viral-sec .vs-h{font-weight:800;font-size:14px;color:#be185d;display:flex;align-items:center;gap:7px;margin-bottom:4px}
+  .viral-sec .vs-t{font-size:13px;color:#831843}
+  @keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  @keyframes blink{0%,60%,100%{opacity:.3}30%{opacity:1}}
+  @keyframes pop{0%{transform:scale(.6);opacity:0}70%{transform:scale(1.1)}100%{transform:scale(1);opacity:1}}
+  @media(max-width:520px){.bubble,.analyze{max-width:88%}.cards,.rec-head,.compare-btn{margin-left:0}.d-hero{height:170px}}
+</style>
 </head>
 <body>
+<div id="root"></div>
+<div class="demo-badge">PROTOTYP · Demo-Daten</div>
 
-    <!-- Demo Control Bar -->
-    <div class="demo-top-bar">
-        <div class="demo-logo">
-            <span>PLANORA <small class="badge-demo">Demo-Modus</small></span>
-        </div>
-        <div class="view-switcher">
-            <button id="btnDesktopView" class="view-btn active" onclick="switchView('desktop')">Desktop-Ansicht</button>
-            <button id="btnMobileView" class="view-btn" onclick="switchView('mobile')">Mobil-Ansicht</button>
-        </div>
-        <div>
-            <a href="index.html" class="back-link">Zurück zur Landingpage</a>
-        </div>
+<script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+<script type="text/babel">
+const { useState, useRef, useEffect } = React;
+
+const LANDING_URL = "index.html";
+
+/* ---------- Inline scene illustrations ---------- */
+function Scene({type, big}){
+  const scenes = {
+    vietnam:(
+      <svg viewBox="0 0 400 200" preserveAspectRatio="xMidYMid slice" style={{width:'100%',height:'100%'}}>
+        <defs><linearGradient id="vsky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#c4b5fd"/><stop offset="1" stopColor="#a5f3fc"/></linearGradient></defs>
+        <rect width="400" height="200" fill="url(#vsky)"/>
+        <circle cx="320" cy="50" r="26" fill="#fef3c7" opacity=".9"/>
+        <path d="M0 150 Q60 110 120 140 T260 130 T400 150 V200 H0Z" fill="#5b8c5a" opacity=".85"/>
+        <path d="M0 165 Q100 135 200 160 T400 160 V200 H0Z" fill="#3f6b47"/>
+        <rect x="180" y="95" width="34" height="60" fill="#7c3aed" opacity=".85"/>
+        <polygon points="180,95 197,72 214,95" fill="#6d28d9"/>
+        <polygon points="184,80 197,62 210,80" fill="#8b5cf6"/>
+        <rect x="120" y="150" width="160" height="40" fill="#1e3a5f" opacity=".55"/>
+      </svg>),
+    portugal:(
+      <svg viewBox="0 0 400 200" preserveAspectRatio="xMidYMid slice" style={{width:'100%',height:'100%'}}>
+        <defs><linearGradient id="psky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#fda4af"/><stop offset="1" stopColor="#fcd34d"/></linearGradient></defs>
+        <rect width="400" height="200" fill="url(#psky)"/>
+        <circle cx="200" cy="80" r="30" fill="#fff7ed" opacity=".95"/>
+        <rect y="120" width="400" height="80" fill="#38bdf8" opacity=".8"/>
+        <path d="M0 130 Q40 122 80 130 T160 130 T240 130 T320 130 T400 130 V200 H0Z" fill="#0ea5e9" opacity=".7"/>
+        <rect x="40" y="90" width="24" height="40" fill="#fff"/><polygon points="40,90 52,74 64,90" fill="#ef4444"/>
+        <rect x="72" y="96" width="22" height="34" fill="#faf5ff"/><polygon points="72,96 83,82 94,96" fill="#f97316"/>
+        <rect x="300" y="92" width="24" height="38" fill="#fff"/><polygon points="300,92 312,76 324,92" fill="#ef4444"/>
+      </svg>),
+    georgien:(
+      <svg viewBox="0 0 400 200" preserveAspectRatio="xMidYMid slice" style={{width:'100%',height:'100%'}}>
+        <defs><linearGradient id="gsky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#a5b4fc"/><stop offset="1" stopColor="#e0e7ff"/></linearGradient></defs>
+        <rect width="400" height="200" fill="url(#gsky)"/>
+        <polygon points="0,200 90,80 160,200" fill="#6b7280"/>
+        <polygon points="90,80 120,120 60,120" fill="#f8fafc"/>
+        <polygon points="120,200 240,50 360,200" fill="#4b5563"/>
+        <polygon points="240,50 285,110 195,110" fill="#f1f5f9"/>
+        <polygon points="300,200 400,110 400,200" fill="#9ca3af"/>
+        <rect x="150" y="150" width="18" height="30" fill="#7c3aed"/><polygon points="150,150 159,138 168,150" fill="#6d28d9"/>
+      </svg>)
+  };
+  return <div style={{position:'absolute',inset:0}}>{scenes[type]}</div>;
+}
+
+/* ---------- Icons ---------- */
+const I = {
+  plane:<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/></svg>,
+  hotel:<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 20h20M4 20V8a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12M9 20v-4h6v4M8 10h.01M12 10h.01M16 10h.01"/></svg>,
+  act:<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 12h16M4 12a8 8 0 0 1 16 0M4 12a8 8 0 0 0 16 0M12 4v16"/></svg>,
+  back:<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>,
+  send:<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>,
+  compare:<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>,
+  spark:<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.4 6.6L21 11l-6.6 2.4L12 20l-2.4-6.6L3 11l6.6-2.4z"/></svg>,
+  lock:<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>,
+  check:<svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6 9 17l-5-5"/></svg>,
+  nplan:<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>,
+  ntrips:<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>,
+  nrecap:<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.6-3.6a2 2 0 0 0-2.8 0L6 20"/></svg>,
+  nprofile:<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a7 7 0 0 1 14 0v1"/></svg>,
+  cam:<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3z"/><circle cx="12" cy="13" r="3"/></svg>,
+  chev:<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6"/></svg>,
+  logo:<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><path d="m8 14 3-6 5-2-3 6-5 2z" fill="currentColor" stroke="none"/></svg>,
+  flame:<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2s5 4 5 9a5 5 0 0 1-10 0c0-1 .3-2 .8-2.8C7.5 9.5 7 11 7 12c0 .5-2-1.5-2-4 0-3 4-6 7-6z"/></svg>,
+  route:<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="6" cy="19" r="2"/><circle cx="18" cy="5" r="2"/><path d="M6 17V9a4 4 0 0 1 4-4h4M18 7v8a4 4 0 0 1-4 4h-4"/></svg>,
+  euro:<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 5a7 7 0 1 0 0 14M4 10h9M4 14h8"/></svg>,
+  star:<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.9 6.3 6.9.6-5.2 4.6 1.6 6.8L12 17.3 5.8 20.9l1.6-6.8L2.2 8.9l6.9-.6z"/></svg>
+};
+
+/* ---------- Photo illustrations for recap ---------- */
+function Photo({kind}){
+  const p={
+    beach:(<svg viewBox="0 0 200 200" preserveAspectRatio="xMidYMid slice" style={{width:'100%',height:'100%'}}><rect width="200" height="200" fill="#38bdf8"/><rect y="120" width="200" height="80" fill="#fcd34d"/><circle cx="150" cy="45" r="22" fill="#fef9c3"/><path d="M0 120 Q50 108 100 120 T200 120 V140 H0Z" fill="#0ea5e9"/><path d="M40 120 l6-30 6 30" fill="#22c55e"/><ellipse cx="46" cy="86" rx="18" ry="8" fill="#16a34a"/></svg>),
+    food:(<svg viewBox="0 0 200 200" preserveAspectRatio="xMidYMid slice" style={{width:'100%',height:'100%'}}><rect width="200" height="200" fill="#fda4af"/><circle cx="100" cy="105" r="62" fill="#fff7ed"/><circle cx="100" cy="105" r="44" fill="#fbbf24"/><circle cx="82" cy="95" r="10" fill="#ef4444"/><circle cx="118" cy="100" r="9" fill="#16a34a"/><circle cx="100" cy="120" r="8" fill="#f97316"/></svg>),
+    city:(<svg viewBox="0 0 200 200" preserveAspectRatio="xMidYMid slice" style={{width:'100%',height:'100%'}}><rect width="200" height="200" fill="#a5b4fc"/><rect x="20" y="90" width="34" height="110" fill="#faf5ff"/><rect x="62" y="60" width="40" height="140" fill="#e9d5ff"/><rect x="110" y="100" width="30" height="100" fill="#faf5ff"/><rect x="146" y="70" width="38" height="130" fill="#ddd6fe"/><circle cx="160" cy="42" r="18" fill="#fef9c3"/></svg>),
+    sunset:(<svg viewBox="0 0 200 200" preserveAspectRatio="xMidYMid slice" style={{width:'100%',height:'100%'}}><defs><linearGradient id="ss" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#fb7185"/><stop offset="1" stopColor="#fbbf24"/></linearGradient></defs><rect width="200" height="200" fill="url(#ss)"/><circle cx="100" cy="110" r="40" fill="#fef3c7" opacity=".9"/><rect y="150" width="200" height="50" fill="#7c2d12" opacity=".6"/></svg>),
+    tram:(<svg viewBox="0 0 200 200" preserveAspectRatio="xMidYMid slice" style={{width:'100%',height:'100%'}}><rect width="200" height="200" fill="#fcd34d"/><rect x="40" y="70" width="120" height="80" rx="10" fill="#facc15"/><rect x="52" y="82" width="40" height="34" fill="#bae6fd"/><rect x="108" y="82" width="40" height="34" fill="#bae6fd"/><circle cx="72" cy="158" r="10" fill="#334155"/><circle cx="128" cy="158" r="10" fill="#334155"/></svg>),
+    mountain:(<svg viewBox="0 0 200 200" preserveAspectRatio="xMidYMid slice" style={{width:'100%',height:'100%'}}><rect width="200" height="200" fill="#bfdbfe"/><polygon points="0,200 70,60 140,200" fill="#64748b"/><polygon points="70,60 95,105 45,105" fill="#f8fafc"/><polygon points="90,200 160,90 200,200" fill="#475569"/></svg>)
+  };
+  return <div style={{position:'absolute',inset:0}}>{p[kind]}</div>;
+}
+
+/* ---------- Data ---------- */
+const DEST = {
+  vietnam:{ id:'vietnam', name:'Vietnam', region:'Hanoi & Halong-Bucht', type:'vietnam',
+    from:690, match:96, weather:'28°C, trocken', tourists:'Mittel', best:'7 Tage',
+    tags:['Natur','Essen','Kultur'],
+    viral:true, trend:{spot:'Ninh Binh & Streetfood Hanoi', views:'2,4 Mio.', platform:'TikTok', tag:'#hanoistreetfood'},
+    why:'Beste Balance aus deinem Budget, authentischer Küche und Natur abseits der Massen.',
+    break:[
+      {icon:'plane', t:'Flug Berlin → Hanoi', s:'Hin- & Rückflug · 1 Stopp · Skyscanner', p:410},
+      {icon:'hotel', t:'Boutique-Hotel Altstadt', s:'6 Nächte · Frühstück · Booking.com', p:210},
+      {icon:'act',  t:'Halong-Bucht Bootstour + Streetfood-Tour', s:'2 Aktivitäten · GetYourGuide', p:70}
+    ],
+    itin:[
+      ['Tag 1','Ankunft Hanoi, Altstadt-Bummel, Streetfood am Abend'],
+      ['Tag 2','Kaffeekultur & Tempel, Wasserpuppentheater'],
+      ['Tag 3','Transfer Halong-Bucht, Übernachtung auf dem Boot'],
+      ['Tag 4','Kajak in versteckten Lagunen, Höhlen'],
+      ['Tag 5','Zurück nach Hanoi, Kochkurs'],
+      ['Tag 6','Tagesausflug Ninh Binh (Reisfelder, wenig Touristen)', true],
+      ['Tag 7','Letzte Märkte, Rückflug']
+    ]},
+  portugal:{ id:'portugal', name:'Portugal', region:'Lissabon & Algarve', type:'portugal',
+    from:750, match:91, weather:'24°C, sonnig', tourists:'Mittel-Hoch', best:'7 Tage',
+    tags:['Strand','Städte','Genuss'],
+    viral:true, trend:{spot:'Benagil-Höhle, Algarve', views:'5,1 Mio.', platform:'TikTok', tag:'#benagilcave'},
+    why:'Kurzer Flug, top Essen und Küste – etwas teurer, aber sehr entspannt planbar.',
+    break:[
+      {icon:'plane', t:'Flug Berlin → Lissabon', s:'Direktflug · Skyscanner', p:190},
+      {icon:'hotel', t:'Design-Hostel + Algarve-Guesthouse', s:'6 Nächte · Booking.com', p:420},
+      {icon:'act',  t:'Küstenwanderung + Weinverkostung', s:'2 Aktivitäten · GetYourGuide', p:140}
+    ],
+    itin:[
+      ['Tag 1','Ankunft Lissabon, Alfama-Viertel'],
+      ['Tag 2','Belém, Pastéis, Fado am Abend'],
+      ['Tag 3','Zug nach Sintra, Paläste'],
+      ['Tag 4','Transfer Algarve, Bootstour zur Benagil-Höhle', true],
+      ['Tag 5','Küstenwanderung Ponta da Piedade'],
+      ['Tag 6','Weinregion, Verkostung'],
+      ['Tag 7','Rückflug ab Faro']
+    ]},
+  georgien:{ id:'georgien', name:'Georgien', region:'Tiflis & Kaukasus', type:'georgien',
+    from:620, match:89, weather:'22°C, klar', tourists:'Niedrig', best:'7 Tage',
+    tags:['Natur','Kultur','Abenteuer'],
+    viral:false, trend:{spot:'Gergeti-Kloster, Kazbegi', views:'880 Tsd.', platform:'Instagram', tag:'#kazbegi'},
+    why:'Günstigste Option und die wenigsten Touristen – ideal, wenn du echtes Abenteuer willst.',
+    break:[
+      {icon:'plane', t:'Flug Berlin → Tiflis', s:'Hin- & Rückflug · 1 Stopp · Skyscanner', p:280},
+      {icon:'hotel', t:'Gästehäuser Tiflis & Kazbegi', s:'6 Nächte · Booking.com', p:240},
+      {icon:'act',  t:'Kaukasus-Wanderung + Weinkeller-Tour', s:'2 Aktivitäten · GetYourGuide', p:100}
+    ],
+    itin:[
+      ['Tag 1','Ankunft Tiflis, Altstadt & Schwefelbäder'],
+      ['Tag 2','Weinregion Kachetien, Verkostung'],
+      ['Tag 3','Fahrt nach Kazbegi, Bergkloster Gergeti', true],
+      ['Tag 4','Wanderung Gveleti-Wasserfälle'],
+      ['Tag 5','Ananuri-Festung, zurück nach Tiflis'],
+      ['Tag 6','Street-Art, Basar, Küche'],
+      ['Tag 7','Rückflug']
+    ]}
+};
+const ORDER = ['vietnam','portugal','georgien'];
+const total = d => d.break.reduce((s,x)=>s+x.p,0);
+
+/* ---------- Components ---------- */
+function Header({onBack}){
+  return (
+    <div className="hd">
+      <div className="logo"><span className="mark">{I.logo}</span>PLANORA</div>
+      <a className="back" href={LANDING_URL}>{I.back} zur Website</a>
     </div>
+  );
+}
 
-    <!-- Main Live Preview Simulator Workspace -->
-    <div class="workspace-wrapper">
-        
-        <!-- CONTAINER FOR BOTH DESKTOP / MOBILE SIMULATION -->
-        <div id="appContainer" class="view-mode-desktop">
-            
-            <!-- SIDEBAR (Visible prominently in Desktop view, hidden or responsive in Mobile view) -->
-            <aside class="app-sidebar">
-                <div class="sidebar-user">
-                    <div class="avatar">U</div>
-                    <div>
-                        <h4>Gast-User</h4>
-                        <p>E-Business Kurs</p>
-                    </div>
-                </div>
-                <div class="sidebar-section">
-                    <h5>Deine geplanten Trips</h5>
-                    <ul class="trip-history-list">
-                        <li class="active">Neuer Live-Trip (Planung...)</li>
-                        <li class="past-trip" onclick="loadPreset('vietnam')">Vietnam Kulinarik (Archiv)</li>
-                        <li class="past-trip" onclick="loadPreset('portugal')">Portugal Strand (Archiv)</li>
-                        <li class="past-trip" onclick="loadPreset('georgien')">Georgien Abenteuer (Archiv)</li>
-                    </ul>
-                </div>
-                <div class="sidebar-footer">
-                    <p>KI-Modell: Planora Core v3.5</p>
-                </div>
-            </aside>
-
-            <!-- MAIN CHAT APP WORKSPACE -->
-            <main class="app-chat-workspace">
-                <header class="chat-header">
-                    <div class="chat-title-info">
-                        <h3>Planora AI Reise-Assistent</h3>
-                        <p class="status-indicator"><span class="pulse-dot"></span> Bereit für deine Wünsche</p>
-                    </div>
-                    <div class="quick-presets">
-                        <button class="preset-pill" onclick="loadPreset('vietnam')">Vietnam</button>
-                        <button class="preset-pill" onclick="loadPreset('portugal')">Portugal</button>
-                        <button class="preset-pill" onclick="loadPreset('georgien')">Georgien</button>
-                    </div>
-                </header>
-
-                <!-- Dynamic Chat Content Box -->
-                <div class="chat-history" id="chatHistory">
-                    <div class="msg msg-bot">
-                        <div class="msg-text">
-                            Hallo! Ich bin dein persönlicher PLANORA KI-Reiseassistent.<br><br>
-                            Egal ob du schon ein festes Ziel hast oder völlig flexibel bist: Beschreibe mir einfach deine Wünsche, deine ungefähre Reisedauer und dein Maximalbudget. Ich plane deinen Traumurlaub in Echtzeit!
-                        </div>
-                    </div>
-                    <div class="typing-indicator" id="typingIndicator">
-                        <span class="dot"></span><span class="dot"></span><span class="dot"></span> Planora optimiert...
-                    </div>
-                </div>
-
-                <!-- Input Footer -->
-                <footer class="chat-input-container">
-                    <textarea id="txtUserInput" rows="1" placeholder="z.B. 7 Tage Urlaub, max. 800 €, liebe gutes Essen, Natur und wenige Touristen..." oninput="autoGrow(this)"></textarea>
-                    <button class="btn-send" id="btnSendChat" onclick="handleUserSend()">➤</button>
-                </footer>
-            </main>
-
-            <!-- SPLIT SCREEN SIDE PANEL: Live Itinerary details (Desktop exclusive for extra polish) -->
-            <section class="app-itinerary-panel">
-                <div class="panel-header">
-                    <h3>Live-Reiseübersicht</h3>
-                    <p>Aktualisiert sich dynamisch per KI</p>
-                </div>
-                <div class="panel-body" id="itineraryDetailView">
-                    <div class="empty-state">
-                        <div class="empty-icon">i</div>
-                        <p>Noch kein Reiseziel finalisiert. Tippe deine Wünsche ein oder nutze einen Quick-Preset oben, um die interaktive Reiseroute anzuzeigen!</p>
-                    </div>
-                </div>
-            </section>
-
+function Card({d, onClick}){
+  return (
+    <div className="card" onClick={onClick}>
+      <div className="scene"><Scene type={d.type}/><span className="match">{d.match}% Match</span></div>
+      <div className="body">
+        <div className="top">
+          <div><h3>{d.name}</h3><div className="sub">{d.region}</div></div>
+          <div className="price">ab {d.from} €<small>{d.best} · p.P.</small></div>
         </div>
+        <div className="tags">{d.tags.map(t=><span className="tag" key={t}>{t}</span>)}</div>
+      </div>
     </div>
+  );
+}
 
-    <script src="js/demo.js"></script>
+function Analyzing({onDone}){
+  const steps=['Verstehe deine Wünsche','Analysiere Preise & Flüge','Prüfe Wetter & Verfügbarkeiten','Vergleiche passende Reiseziele'];
+  const [i,setI]=useState(0);
+  useEffect(()=>{
+    if(i<steps.length){const t=setTimeout(()=>setI(i+1),650);return()=>clearTimeout(t);}
+    const t=setTimeout(onDone,500);return()=>clearTimeout(t);
+  },[i]);
+  return (
+    <div className="msg bot">
+      <div className="avatar">{I.logo}</div>
+      <div className="analyze">
+        {steps.map((s,idx)=>(
+          <div key={s} className={"astep "+(idx<i?'done ':'')+(idx<=i?'on':'')}>
+            <span className="dot"></span>{s}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function ChatScreen({state, dispatch}){
+  const endRef=useRef(null);
+  const [text,setText]=useState('');
+  useEffect(()=>{endRef.current&&endRef.current.scrollIntoView({behavior:'smooth'});},[state.messages,state.phase]);
+
+  const chips=[
+    '7 Tage, max. 800 €, gutes Essen, Natur, wenig Touristen',
+    'Strand & Städtetrip, entspannt, 1 Woche',
+    'Abenteuer & Wandern, kleines Budget, wenig Touristen'
+  ];
+  const submit=(val)=>{
+    const q=(val??text).trim(); if(!q) return;
+    setText(''); dispatch({type:'ASK', q});
+  };
+  return (
+    <>
+      <div className="chat">
+        {state.messages.length===0 && (
+          <div className="intro">
+            <h1>Wohin soll deine nächste Reise gehen?</h1>
+            <p>Beschreibe einfach, wie sich deine Reise anfühlen soll – Budget, Dauer, Stimmung. PLANORA findet das passende Ziel, vergleicht und bucht.</p>
+          </div>
+        )}
+        {state.messages.map((m,idx)=>(
+          <div key={idx} className={"msg "+(m.role==='user'?'user':'bot')}>
+            {m.role==='bot'&&<div className="avatar">{I.logo}</div>}
+            <div className="bubble">{m.text}</div>
+          </div>
+        ))}
+        {state.phase==='analyzing' && <Analyzing onDone={()=>dispatch({type:'RESULTS'})}/>}
+        {state.phase==='results' && <>
+          {state.detected.length>0 && (
+            <div className="pers-banner">
+              <div className="pb-t">{I.logo} Personalisiert für dich</div>
+              <div className="tags">{state.detected.map(t=><span className="tag" key={t}>{t}</span>)}</div>
+            </div>
+          )}
+          <div className="rec-head">Deine besten Reisevorschläge</div>
+          <div className="cards">
+            {state.order.map(id=><Card key={id} d={DEST[id]} onClick={()=>dispatch({type:'OPEN',id})}/>)}
+          </div>
+          <button className="compare-btn" onClick={()=>dispatch({type:'COMPARE'})}>{I.compare} Alle 3 vergleichen</button>
+        </>}
+        <div ref={endRef}/>
+      </div>
+      <div className="inputbar">
+        {state.messages.length===0 && (
+          <div className="chips">{chips.map(c=><button className="chip" key={c} onClick={()=>submit(c)}>{c}</button>)}</div>
+        )}
+        <div className="ib-row">
+          <textarea rows="1" placeholder="Schreib deinen Reisewunsch…" value={text}
+            onChange={e=>setText(e.target.value)}
+            onKeyDown={e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();submit();}}}/>
+          <button className="send" disabled={!text.trim()} onClick={()=>submit()}>{I.send}</button>
+        </div>
+      </div>
+    </>
+  );
+}
+
+function Detail({d, dispatch}){
+  return (
+    <>
+      <div className="subbar"><span className="lk" onClick={()=>dispatch({type:'BACK'})}>{I.back} Zurück zu den Vorschlägen</span></div>
+      <div className="detail">
+        <div className="d-hero"><Scene type={d.type}/><div className="scrim"></div>
+          <div className="d-title"><h2>{d.name}</h2><p>{d.region}</p></div>
+        </div>
+        <div className="d-body">
+          <div className="stat-row">
+            <div className="stat"><div className="k">Match</div><div className="v">{d.match}%</div></div>
+            <div className="stat"><div className="k">Wetter</div><div className="v">{d.weather}</div></div>
+            <div className="stat"><div className="k">Touristen</div><div className="v">{d.tourists}</div></div>
+            <div className="stat"><div className="k">Dauer</div><div className="v">{d.best}</div></div>
+          </div>
+          <p style={{color:'#4b4661',fontSize:15,lineHeight:1.6}}><b>Warum das zu dir passt:</b> {d.why}</p>
+
+          <div className="sec-title">{I.route} Dein Reiseverlauf</div>
+          <div className="itin">
+            {d.itin.map(([dn,dt,viral],i)=>(<div className="day" key={i}><div className="dn">{dn}</div>
+              <div className="dt">{dt}{viral && <span className="day-badge">{I.flame} TikTok viraler Ort</span>}</div></div>))}
+          </div>
+
+          <div className="sec-title">Preis-Aufschlüsselung</div>
+          <div className="breakdown">
+            {d.break.map((b,i)=>(
+              <div className="brow" key={i}><div className="bi">{I[b.icon]}</div>
+                <div className="bt"><div className="b1">{b.t}</div><div className="b2">{b.s}</div></div>
+                <div className="bp">{b.p} €</div></div>
+            ))}
+            <div className="brow total"><div className="bi">{I.euro}</div>
+              <div className="bt"><div className="b1">Gesamt pro Person</div></div>
+              <div className="bp">{total(d)} €</div></div>
+          </div>
+          <div className="partners">Gebucht über:
+            <span className="plogo">Skyscanner</span><span className="plogo">Booking.com</span><span className="plogo">GetYourGuide</span>
+          </div>
+        </div>
+      </div>
+      <div className="stickybar">
+        <div className="pp">Gesamtpreis p.P.<b>{total(d)} €</b></div>
+        <button className="btn" onClick={()=>dispatch({type:'CHECKOUT'})}>Jetzt buchen →</button>
+      </div>
+    </>
+  );
+}
+
+function Compare({dispatch}){
+  const rows=[
+    ['Ab-Preis p.P.', d=>d.from+' €'],
+    ['Match', d=>d.match+'%'],
+    ['Wetter', d=>d.weather],
+    ['Touristen', d=>d.tourists],
+    ['Highlights', d=>d.tags.join(', ')]
+  ];
+  return (
+    <>
+      <div className="subbar"><span className="lk" onClick={()=>dispatch({type:'BACK'})}>{I.back} Zurück</span></div>
+      <div className="cmp">
+        <h2 style={{fontSize:20,fontWeight:800,marginBottom:14}}>Direkter Vergleich</h2>
+        <table className="ct">
+          <thead><tr><th></th>{ORDER.map(id=><th key={id}>{DEST[id].name}</th>)}</tr></thead>
+          <tbody>
+            {rows.map(([label,fn])=>(
+              <tr key={label}><td style={{fontWeight:700,color:'#6B7280'}}>{label}</td>
+                {ORDER.map(id=><td key={id} className={label==='Ab-Preis p.P.'?'d':''}>{fn(DEST[id])}</td>)}</tr>
+            ))}
+            <tr><td></td>{ORDER.map(id=><td key={id}><button className="btn ghost" style={{padding:'8px 14px',fontSize:13}} onClick={()=>dispatch({type:'OPEN',id})}>Ansehen</button></td>)}</tr>
+          </tbody>
+        </table>
+      </div>
+    </>
+  );
+}
+
+function Checkout({d, dispatch}){
+  const [busy,setBusy]=useState(false);
+  const pay=()=>{setBusy(true);setTimeout(()=>dispatch({type:'DONE'}),1600);};
+  return (
+    <div className="co">
+      <span className="lk" style={{color:'#6D28D9',cursor:'pointer',fontWeight:700,marginBottom:14,display:'inline-flex',gap:6,alignItems:'center'}} onClick={()=>dispatch({type:'OPEN',id:d.id})}>{I.back} Zurück</span>
+      <h2>Buchung abschließen</h2>
+      <div className="lead">{d.name} · {d.region} · {d.best}</div>
+      <div className="summary">
+        <div className="sr"><span>Flug (Skyscanner)</span><span>{d.break[0].p} €</span></div>
+        <div className="sr"><span>Unterkunft (Booking.com)</span><span>{d.break[1].p} €</span></div>
+        <div className="sr"><span>Aktivitäten (GetYourGuide)</span><span>{d.break[2].p} €</span></div>
+        <div className="sr tot"><span>Gesamt</span><span>{total(d)} €</span></div>
+      </div>
+      <div className="grid2">
+        <div className="field"><label>Vorname</label><input defaultValue="Lena"/></div>
+        <div className="field"><label>Nachname</label><input defaultValue="Berger"/></div>
+      </div>
+      <div className="field"><label>E-Mail</label><input defaultValue="lena.berger@example.com"/></div>
+      <div className="grid2">
+        <div className="field"><label>Kartennummer</label><input defaultValue="4242 4242 4242 4242"/></div>
+        <div className="field"><label>Gültig bis</label><input defaultValue="08 / 27"/></div>
+      </div>
+      <button className="btn" style={{width:'100%'}} disabled={busy} onClick={pay}>
+        {busy?'Buchung wird bestätigt…':`${total(d)} € bezahlen & buchen`}
+      </button>
+      <div className="secure">{I.lock} Demo – es werden keine echten Zahlungen ausgeführt</div>
+    </div>
+  );
+}
+
+function Confirmation({d, dispatch}){
+  const ref='PLN-'+Math.random().toString(36).slice(2,7).toUpperCase();
+  return (
+    <div className="cf">
+      <div className="ok">{I.check}</div>
+      <h2>Reise gebucht!</h2>
+      <p>Deine Reise nach <b>{d.name}</b> ({d.region}) ist bestätigt. Alle Details gehen per E-Mail an dich raus.</p>
+      <div className="ref">Buchungsnr. {ref}</div>
+      <p style={{fontSize:13}}>Flug, Hotel und Aktivitäten wurden über unsere Partner Skyscanner, Booking.com und GetYourGuide gebucht.</p>
+      <button className="btn" style={{marginTop:18}} onClick={()=>dispatch({type:'RESET'})}>Neue Reise planen</button>
+    </div>
+  );
+}
+
+/* ---------- Past / upcoming trips ---------- */
+const TRIPS_UP=[
+  {id:'vietnam',name:'Vietnam',region:'Hanoi & Halong-Bucht',type:'vietnam',when:'in 3 Wochen · 12.–19. Okt',status:'up'}
+];
+const TRIPS_PAST=[
+  {id:'lissabon',name:'Lissabon',region:'Portugal',type:'portugal',when:'Mai 2025',status:'done'},
+  {id:'tiflis',name:'Tiflis',region:'Georgien',type:'georgien',when:'Sep 2024',status:'done'},
+  {id:'wien',name:'Wien',region:'Österreich',type:'georgien',when:'Feb 2024',status:'done'}
+];
+
+function TripsScreen({dispatch}){
+  return (
+    <div className="page">
+      <h2 className="ph">Meine Reisen</h2>
+      <div className="psub">Geplant, gebucht und schon erlebt.</div>
+      <div style={{fontSize:13,fontWeight:800,color:'#6D28D9',textTransform:'uppercase',letterSpacing:.6,margin:'6px 0 10px'}}>Anstehend</div>
+      {TRIPS_UP.map(t=>(
+        <div className="trip" key={t.id} onClick={()=>dispatch({type:'OPEN',id:t.id})}>
+          <div className="thumb"><Scene type={t.type}/></div>
+          <div className="ti"><div className="tn">{t.name}</div><div className="td">{t.region} · {t.when}</div>
+            <span className="tl">{I.chev} Details ansehen</span></div>
+          <span className="badge up">Gebucht</span>
+        </div>
+      ))}
+      <div style={{fontSize:13,fontWeight:800,color:'#6D28D9',textTransform:'uppercase',letterSpacing:.6,margin:'18px 0 10px'}}>Vergangene Reisen</div>
+      {TRIPS_PAST.map(t=>(
+        <div className="trip" key={t.id} onClick={()=>dispatch({type:'RECAP',id:t.id})}>
+          <div className="thumb"><Scene type={t.type}/></div>
+          <div className="ti"><div className="tn">{t.name}</div><div className="td">{t.region} · {t.when}</div>
+            <span className="tl">{I.cam} Recap ansehen</span></div>
+          <span className="badge done">Erlebt</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+const RECAPS={
+  lissabon:{name:'Lissabon',region:'Portugal · Mai 2025',type:'portugal',
+    stats:[['142','Fotos'],['7','Tage'],['5','Orte'],['38','km zu Fuß']],
+    photos:[
+      {k:'city',c:'Tag 1 – Alfama bei Sonnenuntergang',wide:true},
+      {k:'tram',c:'Tag 2 – Tram 28'},
+      {k:'food',c:'Tag 2 – Pastéis de Nata'},
+      {k:'beach',c:'Tag 4 – Praia da Marinha'},
+      {k:'sunset',c:'Tag 5 – Cabo da Roca'}
+    ]},
+  tiflis:{name:'Tiflis',region:'Georgien · Sep 2024',type:'georgien',
+    stats:[['208','Fotos'],['7','Tage'],['6','Orte'],['54','km gewandert']],
+    photos:[
+      {k:'mountain',c:'Tag 3 – Gergeti-Kloster, Kazbegi',wide:true},
+      {k:'city',c:'Tag 1 – Altstadt Tiflis'},
+      {k:'food',c:'Tag 2 – Khinkali & Wein'},
+      {k:'sunset',c:'Tag 4 – Kaukasus'},
+      {k:'mountain',c:'Tag 4 – Gveleti-Wasserfälle'}
+    ]},
+  wien:{name:'Wien',region:'Österreich · Feb 2024',type:'georgien',
+    stats:[['96','Fotos'],['4','Tage'],['4','Orte'],['22','km zu Fuß']],
+    photos:[
+      {k:'city',c:'Tag 1 – Stephansdom',wide:true},
+      {k:'food',c:'Tag 2 – Sachertorte'},
+      {k:'city',c:'Tag 2 – Schloss Schönbrunn'},
+      {k:'sunset',c:'Tag 3 – Donaukanal'}
+    ]}
+};
+
+function RecapScreen({recapId}){
+  const r=RECAPS[recapId]||RECAPS.lissabon;
+  return (
+    <div className="page">
+      <div className="rc-hero"><Scene type={r.type}/><div className="scrim"></div>
+        <div className="rt"><h2>{r.name}</h2><p>{r.region}</p></div>
+      </div>
+      <div className="rc-stats">
+        {r.stats.map(([n,l])=><div className="rc-stat" key={l}><div className="n">{n}</div><div className="l">{l}</div></div>)}
+      </div>
+      <div className="aigen">{I.logo} PLANORA hat aus deinen Fotos automatisch einen Reise-Rückblick erstellt.</div>
+      <div className="photo-grid">
+        {r.photos.map((p,i)=>(
+          <div className={"photo"+(p.wide?' wide':'')} key={i}><Photo kind={p.k}/><div className="cap">{p.c}</div></div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function ProfileScreen(){
+  return (
+    <div className="page">
+      <div className="prof-hero">
+        <div className="pav">L</div>
+        <div><div className="pn">Lena Berger</div><div className="pm">Berlin · Mitglied seit 2024</div></div>
+      </div>
+      <div className="prof-stats">
+        <div className="s"><div className="n">4</div><div className="l">Reisen</div></div>
+        <div className="s"><div className="n">4</div><div className="l">Länder</div></div>
+        <div className="s"><div className="n">~32 h</div><div className="l">Planung gespart</div></div>
+      </div>
+      <div className="premium">
+        <h3 style={{display:'flex',alignItems:'center',gap:7}}>{I.star} PLANORA Premium</h3>
+        <p>Persönlicher Concierge, Preis-Alarm & unbegrenzte Reisepläne.</p>
+        <button>Jetzt upgraden – 7,99 €/Monat</button>
+      </div>
+      <div style={{fontSize:13,fontWeight:800,color:'#6D28D9',textTransform:'uppercase',letterSpacing:.6,margin:'4px 0 10px'}}>Meine Reisevorlieben</div>
+      <div className="tags" style={{marginBottom:20}}>
+        {['Natur','Gutes Essen','Wenig Touristen','Budget ~800 €','Städtetrips','Wandern'].map(t=><span className="tag" key={t}>{t}</span>)}
+      </div>
+      <div className="menu">
+        <div className="row">Zahlungsmethoden<span className="rv">Visa •••• 4242 {I.chev}</span></div>
+        <div className="row">Benachrichtigungen<span className="rv">Preis-Alarm an {I.chev}</span></div>
+        <div className="row">Datenschutz & Daten<span className="rv">Verwalten {I.chev}</span></div>
+        <div className="row">Sprache<span className="rv">Deutsch {I.chev}</span></div>
+      </div>
+    </div>
+  );
+}
+
+function BottomNav({tab, dispatch}){
+  const items=[['plan','Planen',I.nplan],['trips','Reisen',I.ntrips],['recap','Recap',I.nrecap],['profile','Profil',I.nprofile]];
+  return (
+    <div className="nav">
+      {items.map(([id,label,icon])=>(
+        <button key={id} className={tab===id?'on':''} onClick={()=>dispatch({type:'TAB',tab:id})}>{icon}{label}</button>
+      ))}
+    </div>
+  );
+}
+
+/* ---------- App / state machine ---------- */
+const TAG_RULES=[
+  {re:/natur|wald|berg|see|ruhe|abgeschieden/i, tag:'Natur', v:{vietnam:2,georgien:2,portugal:0}},
+  {re:/essen|kulinar|food|streetfood|küche|genuss/i, tag:'Gutes Essen', v:{vietnam:2,portugal:2,georgien:1}},
+  {re:/wenig tourist|geheimtipp|abseits|überlaufen|ruhig|nicht überlaufen/i, tag:'Wenig Touristen', v:{georgien:2,vietnam:1,portugal:0}},
+  {re:/strand|meer|beach|küste|sonne|baden/i, tag:'Strand & Sonne', v:{portugal:3,vietnam:0,georgien:0}},
+  {re:/stadt|städt|city|kultur|museum|architektur/i, tag:'Städte & Kultur', v:{portugal:2,vietnam:1,georgien:1}},
+  {re:/abenteuer|wandern|hiking|trekking|aktiv|outdoor/i, tag:'Abenteuer', v:{georgien:3,vietnam:1,portugal:0}},
+  {re:/günstig|billig|budget|wenig geld|sparen|backpack/i, tag:'Kleines Budget', v:{georgien:2,vietnam:1,portugal:0}}
+];
+function personalize(q){
+  const scores={vietnam:0,portugal:0,georgien:0}; const detected=[];
+  TAG_RULES.forEach(r=>{ if(r.re.test(q)){ detected.push(r.tag); for(const k in r.v) scores[k]+=r.v[k]; }});
+  const order=(scores.vietnam||scores.portugal||scores.georgien)?[...ORDER].sort((a,b)=>scores[b]-scores[a]):[...ORDER];
+  return {order, detected};
+}
+const initial={ tab:'plan', phase:'chat', messages:[], sel:null, recapId:'lissabon', order:ORDER, detected:[] };
+function reducer(s,a){
+  switch(a.type){
+    case 'TAB': return {...s, tab:a.tab};
+    case 'ASK':{
+      const p=personalize(a.q);
+      const cheap=/malediven|luxus|luxury/i.test(a.q) && /300|400|billig|günstig/i.test(a.q);
+      const msgs=[...s.messages,{role:'user',text:a.q}];
+      let lead;
+      if(cheap){ lead='Ehrlich gesagt: Für die Malediven mit 300 € wird’s eng. Aber keine Sorge – ich habe drei Ziele gefunden, die dein Gefühl von Traumreise treffen und ins Budget passen:'; }
+      else if(p.detected.length){ lead='Verstanden – ich hab deine Wünsche erkannt: '+p.detected.join(', ')+'. Passend dazu sind das meine Top-Vorschläge für dich:'; }
+      else{ lead='Perfekt! Ich habe verstanden, was du suchst. Hier sind meine besten Vorschläge für dich:'; }
+      msgs.push({role:'bot',text:lead});
+      return {...s, tab:'plan', messages:msgs, phase:'analyzing', order:p.order, detected:p.detected};
+    }
+    case 'RESULTS': return {...s, phase:'results'};
+    case 'OPEN': return {...s, tab:'plan', sel:a.id, phase:'detail'};
+    case 'COMPARE': return {...s, phase:'compare'};
+    case 'CHECKOUT': return {...s, phase:'checkout'};
+    case 'DONE': return {...s, phase:'confirmed'};
+    case 'BACK': return {...s, phase:'results'};
+    case 'RECAP': return {...s, tab:'recap', recapId:a.id};
+    case 'RESET': return {...initial};
+    default: return s;
+  }
+}
+function App(){
+  const [state,dispatch]=React.useReducer(reducer,initial);
+  const d = state.sel?DEST[state.sel]:null;
+  const planTop = state.phase==='chat'||state.phase==='analyzing'||state.phase==='results';
+  const inFlow = state.tab==='plan' && !planTop; // detail/compare/checkout/confirmed
+  const showNav = !inFlow;
+  return (
+    <div className="app">
+      <Header/>
+      {state.tab==='plan' && planTop && <ChatScreen state={state} dispatch={dispatch}/>}
+      {state.tab==='plan' && state.phase==='detail' && <Detail d={d} dispatch={dispatch}/>}
+      {state.tab==='plan' && state.phase==='compare' && <Compare dispatch={dispatch}/>}
+      {state.tab==='plan' && state.phase==='checkout' && <Checkout d={d} dispatch={dispatch}/>}
+      {state.tab==='plan' && state.phase==='confirmed' && <Confirmation d={d} dispatch={dispatch}/>}
+      {state.tab==='trips' && <TripsScreen dispatch={dispatch}/>}
+      {state.tab==='recap' && <RecapScreen recapId={state.recapId}/>}
+      {state.tab==='profile' && <ProfileScreen/>}
+      {showNav && <BottomNav tab={state.tab} dispatch={dispatch}/>}
+    </div>
+  );
+}
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
 </body>
 </html>
